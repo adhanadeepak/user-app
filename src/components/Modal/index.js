@@ -26,7 +26,11 @@ const Modal = styled(`div`)`
   background: #fff;
   border: 1px solid #efefef;
   border-radius: 4px;
-  box-shadow: 0 0 8px 4px #d4ebd0;;
+  box-shadow: 0 0 8px 4px #d4ebd0;
+  
+  @media screen and (max-width: 765px){
+    width: 280px;
+  }
 
   
   & .modal-header{
@@ -60,24 +64,14 @@ const Modal = styled(`div`)`
       .first-row{
         display: flex;
         justify-content: space-between;
+        
+        @media screen and (max-width: 765px){
+          flex-direction: column;
+        }
       }
   }
   
 `;
-
-const ClearButton = styled(`button`)`
-  border: none;
-  padding: 4px;
-  font-size: 14px;
-  outline: none;
-  color: #333333;
-  
-  &:hover{
-  background-color: #b1b1b1;
-  }
-`;
-
-
 
 function Index(props) {
 

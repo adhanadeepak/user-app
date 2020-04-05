@@ -10,6 +10,8 @@ const Container = styled(`div`)`
   width: 100%;
   display: flex;
   background-color: #f3c623;
+  
+  
 `;
 
 const UserList = styled(`div`)`
@@ -22,6 +24,12 @@ const UserList = styled(`div`)`
   & .list{
     list-style: none;
     padding: 0;
+    height: 53vh;
+    overflow: auto;
+    
+    @media screen and (max-width: 765px){
+      height: 60vh;
+    }
   }
   & li:last-child{
     border-bottom: none !important;
@@ -57,34 +65,16 @@ const UserList = styled(`div`)`
 `;
 
 const Pagination = styled(`div`)`
-  
-  & .pagination-list{
     display: flex;
-    list-style: none;
-    padding: 0;
-    justify-content: space-around;
+    align-items: center;
+    justify-content: flex-start;
     
-    .current{
-      padding: 4px 8px;
-    }
-    
-    .page-item{
-    cursor:pointer;
-    }
-    
-    .button{
-      padding: 4px 8px;
-      border: 1px solid #323232;
-      border-radius: 4px;
-      cursor:pointer;
-      
-      &:hover{
-        background-color: #d4ebd0;
-        color: #333333;
-        transition: background-color ease-in-out 300ms;
-      }
-    }
-  }
+    & .load-more-btn{
+      background-color: transparent;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }    
 `;
 
 const SearchContainer = styled(`div`)`
@@ -119,6 +109,7 @@ function Home(props) {
     const[ad,setAd] = useState({});
     const[page, setPage] = useState(1);
     const[totalPage, setLastPage] = useState(0);
+    const[loadMore, disableLoadMore] = useState(false);
     const[selectedUser, setSelectedUser] = useState({});
 
     const[showModal, hideModal] = useState(false);
@@ -130,9 +121,9 @@ function Home(props) {
             })
             .then((response)=>{
                 if(response && Object.keys(response).length > 0){
-                    setUsers(response.data);
+                    setUsers((prevUsers)=> ([ ...prevUsers, ...response.data]));
                     setAd(response.ad);
-                    setSearchList(response.data);
+                    setSearchList((prevUsers)=> ([ ...prevUsers, ...response.data]));
                     setPage(response.page);
                     setLastPage(response.total_pages);
                 }
@@ -160,6 +151,7 @@ function Home(props) {
             currentPage = totalPage;
         }
         if(currentPage <= totalPage && currentPage > 0 ) getList(currentPage);
+        else disableLoadMore(true);
 
     };
 
@@ -211,26 +203,15 @@ function Home(props) {
                             </li>
                         ))}
                     </ul>
+                    {
+                        !loadMore ?
+                        <Pagination>
+                            <button className={`load-more-btn`} onClick={()=> getUserList(`next`)}>Load more..</button>
+                        </Pagination>
+                        :
+                        null
+                    }
                 </UserList>
-                <Pagination>
-                    <ul className={`pagination-list`}>
-                        <li className={`page-item`} onClick={()=> getUserList('previous')}>
-                            <Icon type={`back`} />
-                        </li>
-                        <li className={`page-item button`} onClick={()=> getUserList('first')}>
-                            First
-                        </li>
-                        <li className={`page-item current`}>
-                            {page}
-                        </li>
-                        <li className={`page-item button`} onClick={()=> getUserList('last')}>
-                            Last
-                        </li>
-                        <li className={`page-item`} onClick={()=> getUserList('next')}>
-                            <Icon type={`forward`}/>
-                        </li>
-                    </ul>
-                </Pagination>
             </div>
             <Modal show={showModal} hide={hideModal} user={selectedUser}/>
         </Container>
