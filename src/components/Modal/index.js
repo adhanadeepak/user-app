@@ -1,8 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Avatar from "components/Avatar";
 import styled from "styled-components";
-
 
 const Container = styled(`div`)`
   width: 100vw;
@@ -103,8 +101,5 @@ function Index(props) {
         </Container>
     );
 }
-
-Index.propTypes = {};
-Index.defaultProps = {};
 
 export default Index;

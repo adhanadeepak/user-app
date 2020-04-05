@@ -10,8 +10,6 @@ const Container = styled(`div`)`
   width: 100%;
   display: flex;
   background-color: #f3c623;
-  
-  
 `;
 
 const UserList = styled(`div`)`
@@ -31,6 +29,7 @@ const UserList = styled(`div`)`
       height: 60vh;
     }
   }
+  
   & li:last-child{
     border-bottom: none !important;
   }
@@ -102,13 +101,12 @@ const SearchBar = styled(`input`)`
   background-color: #333333;
 `;
 
-function Home(props) {
+function Home() {
 
     const[users, setUsers] = useState([]);
     const[searchList, setSearchList] = useState([]);
-    const[ad,setAd] = useState({});
     const[page, setPage] = useState(1);
-    const[totalPage, setLastPage] = useState(0);
+    const[totalPage, setTotalPage] = useState(0);
     const[loadMore, disableLoadMore] = useState(false);
     const[selectedUser, setSelectedUser] = useState({});
 
@@ -122,10 +120,9 @@ function Home(props) {
             .then((response)=>{
                 if(response && Object.keys(response).length > 0){
                     setUsers((prevUsers)=> ([ ...prevUsers, ...response.data]));
-                    setAd(response.ad);
                     setSearchList((prevUsers)=> ([ ...prevUsers, ...response.data]));
                     setPage(response.page);
-                    setLastPage(response.total_pages);
+                    setTotalPage(response.total_pages);
                 }
                 else{
                     return false;
@@ -136,23 +133,11 @@ function Home(props) {
             })
     };
 
-    const getUserList = (type) => {
+    const loadMoreUsers = () => {
         let currentPage = page;
-        if(type === 'next'){
-            currentPage++;
-        }
-        else if(type === 'previous'){
-            currentPage--;
-        }
-        else if(type === 'first'){
-            currentPage = 0;
-        }
-        else if(type === 'last'){
-            currentPage = totalPage;
-        }
+        currentPage++;
         if(currentPage <= totalPage && currentPage > 0 ) getList(currentPage);
         else disableLoadMore(true);
-
     };
 
     useEffect(()=>{
@@ -163,8 +148,9 @@ function Home(props) {
 
     const searchUser = (e) => {
         e.preventDefault();
-        search = (e.target.value).toLowerCase();
         let usersList = [...searchList];
+        search = (e.target.value).toLowerCase();
+
         if(search !== '' && search.length > 0){
             let tempList = usersList.filter(user => {
                 if(user.first_name.toLowerCase().includes(search) || user.last_name.toLowerCase().includes(search)){
@@ -206,7 +192,7 @@ function Home(props) {
                     {
                         !loadMore ?
                         <Pagination>
-                            <button className={`load-more-btn`} onClick={()=> getUserList(`next`)}>Load more..</button>
+                            <button className={`load-more-btn`} onClick={()=> loadMoreUsers()}>Load more..</button>
                         </Pagination>
                         :
                         null

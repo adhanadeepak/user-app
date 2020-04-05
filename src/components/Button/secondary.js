@@ -12,7 +12,6 @@ const Button = styled(`button`)`
     border: none;
     border-radius: 4px;
     background-color: #FEB23E;
-}
 `;
 
 function Secondary({children,...other}) {

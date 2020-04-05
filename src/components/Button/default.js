@@ -11,7 +11,6 @@ const Button = styled(`button`)`
     outline: none;
     border: 1px solid #1b62b3;
     border-radius: 4px;
-}
 `;
 
 function Default({children,...other}) {
