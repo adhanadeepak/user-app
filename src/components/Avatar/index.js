@@ -5,6 +5,7 @@ const RoundImage = styled(`img`)`
     border: 1px solid #efefef;
     border-radius: 50%;
     width: ${props => props.width || '32px'};
+    cursor: pointer;
 `;
 
 function Avatar(props) {

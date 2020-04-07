@@ -4,63 +4,118 @@ import Avatar from "components/Avatar/index";
 import Icon from 'components/Icon/index';
 import Modal from 'components/Modal/index';
 
+import BackIcon from 'Assets/images/back.png';
+import ForwardIcon from 'Assets/images/next.png';
+
 const Container = styled(`div`)`
   padding: 16px;
   height: 100vh;
   width: 100%;
-  display: flex;
-  background-color: #f3c623;
-`;
-
-const UserList = styled(`div`)`
-  width: 310px;
-  padding: 16px;
-  background: #d4ebd0;
-  border: 1px solid #efefef;
-  box-shadow: 0 0 8px 0 #efefef;
+  background-color: #fff;
   
-  & .list{
-    list-style: none;
-    padding: 0;
-    height: 53vh;
-    overflow: auto;
-    
-    @media screen and (max-width: 765px){
-      height: 60vh;
+  .w-full{
+    width: 100%;
+  }
+  
+  @media screen and (max-width: 765px){
+    button:focus, li:focus{
+      outline: none;
+    }
+    button:active, li:active{
+      outline: none;
     }
   }
-  
-  & li:last-child{
-    border-bottom: none !important;
-  }
-  
-  & .list > .list-item{
-    display: flex;
-    margin : 16px 0;
-    border-bottom: 1px solid #927a22;
-      .content{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-evenly;
-        margin-left: 42px;
-        
-        .name{
-          width: 100%;
-          margin: 0;  
-          text-transform: capitalize; 
-          text-align: left;     
-        }
-        .email{
-          width: 100%;
-          margin: 0;
-          text-transform: lowercase;
-          color: #6a6a6a;
-          font-weight: 400;
-          text-align: left;
-        }      
+`;
+
+const UserTable = styled(`div`)`
+  margin: 32px 0;
+  table{
+  border: 1px solid #efefef;
+  border-collapse: collapse;
+    width: 100%;
+      thead{
+          tr{
+            border-bottom: 1px solid #efefef;
+          }
+          tr > th{
+            padding: 8px;
+            text-align: left;
+          }
+          
+          @media screen and (max-width: 765px){
+            display: none;
+            
+          }
+      }
+      
+      tbody{
+          tr {
+            border-bottom: 1px solid #efefef;
+            td{
+              padding: 8px;
+            }
+            td.name-cell{
+              display: flex;
+              align-items: center;
+              
+              .content{
+                display: flex;
+                align-items: center;
+                
+                .email{
+                  display: none;
+                }
+              }
+              .content > .name{
+                margin: 0;
+                padding: 0 16px;
+              }
+            }
+            
+            td.email-cell{
+              .email{
+                
+              }
+            }
+            
+            @media screen and (max-width: 765px){
+              display: flex;
+              td.name-cell{
+                width: 100%;
+                .content{
+                   flex-direction: column;
+                   text-align: left; 
+                   align-items: flex-start;
+                   margin-left: 24px;
+                   
+                   .name{
+                    padding: 0;
+                   }
+                  .email{
+                    display: inline-block;
+                    margin: 0;
+                    font-size: 12px;
+                  }
+                }
+              }
+              
+              td.email-cell{
+               display: none;
+            }
+              
+              td.number-cell{
+                display: none;
+              }
+              
+            }
+          }
       }
   }
+  
+  @media screen and (max-width: 765px){
+    margin: 16px 0 0 0;
+  }
+ 
 `;
 
 const Pagination = styled(`div`)`
@@ -73,7 +128,57 @@ const Pagination = styled(`div`)`
       border: none;
       outline: none;
       font-size: 14px;
-    }    
+    } 
+    
+    && button.active{
+      border-radius: 50%;
+      background-color: #f3c623;
+    }
+    
+    .page{
+      cursor:pointer;
+      padding: 8px 16px;
+    }
+    
+    .page:hover{
+      background-color: #f3c623;
+      opacity: 0.6;      
+      border-radius: 50%;
+      
+    }
+    
+    .list{
+        padding: 0;
+        display: flex;
+        list-style: none;
+        align-items: center;
+          
+        li{
+          margin: 0 4px;
+          display: flex;
+          align-items: center;
+        }  
+        .forward , .back{
+          width: 32px;
+          cursor: pointer;
+        }
+        
+        .number{
+        font-size: 18px;
+        }
+    }
+    
+    .clear{
+      border: none;
+      outline: none;
+      background-color: transparent;
+      
+      @media screen and (max-width: 765px){
+        border: unset;
+        outline: unset;
+      }
+     
+    }   
 `;
 
 const SearchContainer = styled(`div`)`
@@ -82,10 +187,14 @@ const SearchContainer = styled(`div`)`
   border-radius: 4px;
   display: flex;
   align-items: center;
-  width: 100%;
+  width: 260px;
   
   &:focus, &:hover{
     box-shadow: 0 0 4px 2px #f3c623;
+  }
+  
+  @media screen and (max-width: 765px){
+    width: 100%;
   }
 `;
 
@@ -107,7 +216,6 @@ function Home() {
     const[searchList, setSearchList] = useState([]);
     const[page, setPage] = useState(1);
     const[totalPage, setTotalPage] = useState(0);
-    const[loadMore, disableLoadMore] = useState(false);
     const[selectedUser, setSelectedUser] = useState({});
 
     const[showModal, hideModal] = useState(false);
@@ -119,8 +227,8 @@ function Home() {
             })
             .then((response)=>{
                 if(response && Object.keys(response).length > 0){
-                    setUsers((prevUsers)=> ([ ...prevUsers, ...response.data]));
-                    setSearchList((prevUsers)=> ([ ...prevUsers, ...response.data]));
+                    setUsers(response.data);
+                    setSearchList(response.data);
                     setPage(response.page);
                     setTotalPage(response.total_pages);
                 }
@@ -133,11 +241,22 @@ function Home() {
             })
     };
 
-    const loadMoreUsers = () => {
+    const getUserList = (type) => {
         let currentPage = page;
-        currentPage++;
+        if(type === 'next'){
+            currentPage++;
+        }
+        else if(type === 'previous'){
+            currentPage--;
+        }
+        else if(type === 'first'){
+            currentPage = 0;
+        }
+        else if(type === 'last'){
+            currentPage = totalPage;
+        }
         if(currentPage <= totalPage && currentPage > 0 ) getList(currentPage);
-        else disableLoadMore(true);
+
     };
 
     useEffect(()=>{
@@ -168,36 +287,70 @@ function Home() {
     return (
         <Container className={``}>
             <div style={{margin: '0 auto'}}>
-                <h4>Users</h4>
-                <UserList >
-                    <SearchContainer>
-                        <Icon type={`search`}/>
-                        <SearchBar placeholder={`Search user`} onChange={searchUser} />
-                    </SearchContainer>
+                <SearchContainer>
+                    <Icon type={`search`}/>
+                    <SearchBar placeholder={`Search user`} onChange={searchUser} />
+                </SearchContainer>
+               <UserTable>
+                   <table className={`table`}>
+                       <thead>
+                       <tr>
+                           <th>Name</th>
+                           <th>Email</th>
+                           <th>Phone</th>
+                       </tr>
+                       </thead>
+                        <tbody>
+                        {
+                            users && users.map((user,index) => (
+                                <tr>
+                                    <td className={`name-cell`}>
+                                        <Avatar  src={user.avatar} width={`54px`} onClick={()=>{
+                                            hideModal(true);
+                                            setSelectedUser(user);
+                                        }
+                                        } className={`image`}/>
+                                        <div className={`content`}>
+                                            <h5 className={`name`}>{user.first_name} {user.last_name}</h5>
+                                            <h5 className={`email`}>{user.email}</h5>
+                                        </div>
+                                    </td>
+                                    <td className={`email-cell`}>
+                                        <h5 className={`email`}>{user.email}</h5>
+                                    </td>
+                                    <td className={`number-cell`}>{`+91 9876543210`}</td>
+                                </tr>
+                            ))
+                        }
+                        </tbody>
+                   </table>
+               </UserTable>
+                <Pagination>
                     <ul className={`list`}>
-                        { users && users.map((user, index)=> (
-                            <li className={`list-item`} key={index+user.id-1}>
-                                <Avatar  src={user.avatar} width={`54px`} onClick={()=>{
-                                    hideModal(true);
-                                    setSelectedUser(user);
-                                }
-                                } className={`image`}/>
-                                <div className={`content`}>
-                                    <h5 className={`name`}>{user.first_name} {user.last_name}</h5>
-                                    <h6 className={`email`}>{user.email}</h6>
-                                </div>
-                            </li>
-                        ))}
+                        <li>
+                            <button className={`back clear`} onClick={()=> getUserList('previous')}>
+                                <img
+                                    className={`w-full`}
+                                    src={BackIcon}
+                                    alt=""/>
+                            </button>
+                        </li>
+                        <li>
+                            <button className={`clear number ${page === 1 ? 'active' : ''} page`} onClick={()=> getList(1)}>1</button>
+                        </li>
+                        <li>
+                            <button className={`clear number ${page === 2 ? 'active' : ''} page`} onClick={()=> getList(2)}>2</button>
+                        </li>
+                        <li>
+                            <button className={`forward clear`} onClick={()=> getUserList('next')}>
+                                <img
+                                    className={`w-full`}
+                                    src={ForwardIcon}
+                                    alt=""/>
+                            </button>
+                        </li>
                     </ul>
-                    {
-                        !loadMore ?
-                        <Pagination>
-                            <button className={`load-more-btn`} onClick={()=> loadMoreUsers()}>Load more..</button>
-                        </Pagination>
-                        :
-                        null
-                    }
-                </UserList>
+                </Pagination>
             </div>
             <Modal show={showModal} hide={hideModal} user={selectedUser}/>
         </Container>

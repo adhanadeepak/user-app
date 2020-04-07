@@ -24,7 +24,7 @@ const Modal = styled(`div`)`
   background: #fff;
   border: 1px solid #efefef;
   border-radius: 4px;
-  box-shadow: 0 0 8px 4px #d4ebd0;
+  box-shadow: 0 0 8px 4px #f3c623;
   
   @media screen and (max-width: 765px){
     width: 280px;
